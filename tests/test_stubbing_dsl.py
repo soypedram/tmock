@@ -1,6 +1,6 @@
 import pytest
 
-from tmock import given, tmock, verify
+from tmock import any, given, tmock, verify
 from tmock.exceptions import TMockStubbingError, TMockUnexpectedCallError
 
 
@@ -79,6 +79,46 @@ class TestStubbingDsl:
         # Later any() stub wins even for value 1
         assert mock.foo(1) == "any"
         assert mock.foo(2) == "any"
+
+    def test_runs_captures_call_order(self):
+        """Verify calls happened in a specific order—something verify() can't express."""
+
+        class Logger:
+            def log(self, level: str) -> None:
+                pass
+
+        call_order: list[str] = []
+        mock = tmock(Logger)
+        given().call(mock.log(any(str))).runs(lambda args: call_order.append(args.get_by_name("level")))
+
+        mock.log("info")
+        mock.log("warning")
+        mock.log("error")
+
+        assert call_order == ["info", "warning", "error"]
+
+    def test_stub_returns_another_mock(self):
+        """A mock can return another mock for testing chained dependencies."""
+
+        class Session:
+            def execute(self, query: str) -> list[dict]:
+                return []
+
+        class SessionFactory:
+            def create_session(self) -> Session:
+                return Session()
+
+        factory = tmock(SessionFactory)
+        session = tmock(Session)
+
+        given().call(factory.create_session()).returns(session)
+        given().call(session.execute(any(str))).returns([{"id": 1, "name": "Alice"}])
+
+        result = factory.create_session().execute("SELECT * FROM users")
+
+        assert result == [{"id": 1, "name": "Alice"}]
+        verify().call(factory.create_session()).once()
+        verify().call(session.execute("SELECT * FROM users")).once()
 
 
 class TestIncompleteStubDetection:
