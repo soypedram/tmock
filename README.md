@@ -143,7 +143,7 @@ db = tmock(Database)
 
 ### Stubbing (The `given` DSL)
 
-Stubbing is done explicitly. This allows `tmock` to validate that what you are mocking is actually possible.
+**Define stubs before calling.** Unlike `unittest.mock`, tmock requires you to declare behavior upfront—calling an unstubbed method raises `TMockUnexpectedCallError`.
 
 ```python
 # Simple return value
@@ -158,6 +158,10 @@ given().call(db.connect()).raises(ConnectionError("Timeout"))
 # Dynamic responses
 given().call(db.calculate(10)).runs(lambda args: args.get_by_name("val") * 2)
 
+# Returning a mock from a stubbed method (for chained dependencies)
+session = tmock(Session)
+given().call(factory.create_session()).returns(session)
+given().call(session.execute(any(str))).returns([{"id": 1}])
 ```
 
 ### Verification (The `verify` DSL)
@@ -224,4 +228,18 @@ with tpatch.class_var(Config, "MAX_RETRIES") as field:
 given().call(api_client.fetch_data()).returns(data)
 
 # The mock is automatically awaitable
-result = await api_client.fetch_data() 
+result = await api_client.fetch_data()
+```
+
+## Documentation
+
+- [Stubbing](docs/stubbing.md) — Define behavior with `.returns()`, `.raises()`, `.runs()`
+- [Verification](docs/verification.md) — Assert interactions with `.once()`, `.times()`, `.never()`
+- [Argument Matchers](docs/matchers.md) — Flexible matching with `any()` and `any(Type)`
+- [Fields & Properties](docs/fields.md) — Mock getters/setters on dataclasses, Pydantic, properties
+- [Patching](docs/patching.md) — Replace real code with `tpatch.method()`, `tpatch.function()`, etc.
+- [Mocking Functions](docs/functions.md) — Mock standalone functions with `tmock(func)`
+- [Protocols](docs/protocols.md) — Mock `typing.Protocol` interfaces
+- [Async Support](docs/async.md) — Async methods and context managers
+- [Reset Functions](docs/reset.md) — Clear stubs and interactions between tests
+- [Magic Methods](docs/magic-methods.md) — Context managers, iteration, containers, and more
