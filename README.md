@@ -53,12 +53,14 @@ Mocking properties or data attributes usually requires verbose `__setattr__` pat
 
 ## Installation
 
-`tmock` is currently in late-stage development and is **coming soon to PyPI**.
+Install `tmock` from PyPI using your favorite package manager:
 
 ```bash
-# Coming soon
+# Using pip
 pip install tmock
 
+# Using uv (recommended)
+uv add tmock
 ```
 
 ## Quick Demo
