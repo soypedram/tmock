@@ -1,9 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "tmock"
 version = "0.1.0"
-description = "Add your description here"
+description = "A strict, type-safe mock library for Python with full IDE autocomplete support."
 readme = "README.md"
+authors = [{name = "Pedram", email = "pedram.esmaeeli@gmail.com"}]
 requires-python = ">=3.13"
+license = {text = "MIT"}
+keywords = ["mock", "testing", "type-safe", "mockito", "mypy", "pyright"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing :: Mocking",
+    "Typing :: Typed",
+]
 dependencies = [
     "typeguard>=4.0.0",
 ]
@@ -17,6 +33,9 @@ dev = [
     "pytest-asyncio",
     "pydantic>=2.0",
 ]
+
+[project.urls]
+Repository = "https://github.com/soypedram/tmock"
 
 [tool.setuptools.packages.find]
 where = ["src"]
